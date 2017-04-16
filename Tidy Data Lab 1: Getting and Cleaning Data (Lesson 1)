@@ -1,3 +1,171 @@
+| Please choose a lesson, or type 0 to return to course menu.
+
+1: Manipulating Data with dplyr
+2: Grouping and Chaining with dplyr
+3: Tidying Data with tidyr
+4: Dates and Times with lubridate
+
+Selection: 1
+
+| Attempting to load lesson dependencies...
+
+| Package ‘dplyr’ loaded correctly!
+
+  |                                                           |   0%
+
+| In this lesson, you'll learn how to manipulate data using dplyr.
+| dplyr is a fast and powerful R package written by Hadley Wickham
+| and Romain Francois that provides a consistent and concise grammar
+| for manipulating tabular data.
+
+...
+
+  |=                                                          |   2%
+
+| One unique aspect of dplyr is that the same set of tools allow you
+| to work with tabular data from a variety of sources, including
+| data frames, data tables, databases and multidimensional arrays.
+| In this lesson, we'll focus on data frames, but everything you
+| learn will apply equally to other formats.
+
+...
+
+  |==                                                         |   3%
+
+| As you may know, "CRAN is a network of ftp and web servers around
+| the world that store identical, up-to-date, versions of code and
+| documentation for R" (http://cran.rstudio.com/). RStudio maintains
+| one of these so-called 'CRAN mirrors' and they generously make
+| their download logs publicly available
+| (http://cran-logs.rstudio.com/). We'll be working with the log
+| from July 8, 2014, which contains information on roughly 225,000
+| package downloads.
+
+...
+
+  |===                                                        |   5%
+
+| I've created a variable called path2csv, which contains the full
+| file path to the dataset. Call read.csv() with two arguments,
+| path2csv and stringsAsFactors = FALSE, and save the result in a
+| new variable called mydf. Check ?read.csv if you need help.
+
+> mydf <- read.csv(path2csv, stringsAsFactors = FALSE)
+
+| You are quite good my friend!
+
+  |====                                                       |   7%
+
+| Use dim() to look at the dimensions of mydf.
+
+> dim(mydf)
+[1] 225468     11
+
+| All that practice is paying off!
+
+  |=====                                                      |   8%
+
+| Now use head() to preview the data.
+
+> head(mydf)
+  X       date     time   size r_version r_arch      r_os
+1 1 2014-07-08 00:54:41  80589     3.1.0 x86_64   mingw32
+2 2 2014-07-08 00:59:53 321767     3.1.0 x86_64   mingw32
+3 3 2014-07-08 00:47:13 748063     3.1.0 x86_64 linux-gnu
+4 4 2014-07-08 00:48:05 606104     3.1.0 x86_64 linux-gnu
+5 5 2014-07-08 00:46:50  79825     3.0.2 x86_64 linux-gnu
+6 6 2014-07-08 00:48:04  77681     3.1.0 x86_64 linux-gnu
+       package version country ip_id
+1    htmltools   0.2.4      US     1
+2      tseries 0.10-32      US     2
+3        party  1.0-15      US     3
+4        Hmisc  3.14-4      US     3
+5       digest   0.6.4      CA     4
+6 randomForest   4.6-7      US     3
+
+| Keep up the great work!
+
+  |======                                                     |  10%
+
+| The dplyr package was automatically installed (if necessary) and
+| loaded at the beginning of this lesson. Normally, this is
+| something you would have to do on your own. Just to build the
+| habit, type library(dplyr) now to load the package again.
+
+> library(dplyr)
+
+| You are really on a roll!
+
+  |=======                                                    |  12%
+
+| It's important that you have dplyr version 0.4.0 or later. To
+| confirm this, type packageVersion("dplyr").
+
+> packageVersion("dplyr")
+[1] ‘0.5.0’
+
+| Great job!
+
+  |========                                                   |  13%
+
+| If your dplyr version is not at least 0.4.0, then you should hit
+| the Esc key now, reinstall dplyr, then resume this lesson where
+| you left off.
+
+...
+
+  |=========                                                  |  15%
+
+| The first step of working with data in dplyr is to load the data
+| into what the package authors call a 'data frame tbl' or 'tbl_df'.
+| Use the following code to create a new tbl_df called cran:
+| 
+| cran <- tbl_df(mydf).
+
+> cran <- tbl_df(mydf)
+
+| You are doing so well!
+
+  |==========                                                 |  17%
+
+| To avoid confusion and keep things running smoothly, let's remove
+| the original data frame from your workspace with rm("mydf").
+
+> rm("mydf")
+
+| You got it!
+
+  |===========                                                |  18%
+
+| From ?tbl_df, "The main advantage to using a tbl_df over a regular
+| data frame is the printing." Let's see what is meant by this. Type
+| cran to print our tbl_df to the console.
+
+> cran
+# A tibble: 225,468 × 11
+       X       date     time    size r_version r_arch      r_os
+   <int>      <chr>    <chr>   <int>     <chr>  <chr>     <chr>
+1      1 2014-07-08 00:54:41   80589     3.1.0 x86_64   mingw32
+2      2 2014-07-08 00:59:53  321767     3.1.0 x86_64   mingw32
+3      3 2014-07-08 00:47:13  748063     3.1.0 x86_64 linux-gnu
+4      4 2014-07-08 00:48:05  606104     3.1.0 x86_64 linux-gnu
+5      5 2014-07-08 00:46:50   79825     3.0.2 x86_64 linux-gnu
+6      6 2014-07-08 00:48:04   77681     3.1.0 x86_64 linux-gnu
+7      7 2014-07-08 00:48:35  393754     3.1.0 x86_64 linux-gnu
+8      8 2014-07-08 00:47:30   28216     3.0.2 x86_64 linux-gnu
+9      9 2014-07-08 00:54:58    5928      <NA>   <NA>      <NA>
+10    10 2014-07-08 00:15:35 2206029     3.0.2 x86_64 linux-gnu
+# ... with 225,458 more rows, and 4 more variables: package <chr>,
+#   version <chr>, country <chr>, ip_id <int>
+
+| All that practice is paying off!
+
+  |============                                               |  20%
+
+| This output is much more informative and compact than what we
+| would get if we printed the original data frame (mydf) to the
+| console.
+
 ...
 
   |=============                                              |  22%
@@ -425,15 +593,6 @@
 | Now, put an exclamation point (!) before is.na() to change all of
 | the TRUEs to FALSEs and all of the FALSEs to TRUEs, thus telling
 | us what is NOT NA: !is.na(c(3, 5, NA, 10)).
-
-> "!is.na(c(3, 5, NA, 10))"
-[1] "!is.na(c(3, 5, NA, 10))"
-
-| You almost had it, but not quite. Try again. Or, type info() for
-| more options.
-
-| 5, NA, 10)) will negate the previous command, thus telling us what
-| is NOT NA.
 
 > !is.na(c(3, 5, NA, 10))
 [1]  TRUE  TRUE FALSE  TRUE
